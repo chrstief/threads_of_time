@@ -1,9 +1,9 @@
 "use client";
-import { Bungee_Inline } from "next/font/google";
-import { ThemeController } from "./ThemeController";
+
 import { Eraser, Pencil } from "lucide-react";
-import { useLocalStorage } from "usehooks-ts";
+import { Bungee_Inline } from "next/font/google";
 import { useRef, useState } from "react";
+import { useLocalStorage } from "usehooks-ts";
 
 const bungeeInline = Bungee_Inline({
   weight: "400",
@@ -68,10 +68,10 @@ export default function Home() {
     <div>
       {/* <ThemeController /> */}
 
-      <div className="flex flex-col items-center w-fit m-auto">
+      <div className="m-auto flex w-fit flex-col items-center">
         <div
           style={bungeeInline.style}
-          className="text-9xl text-center pt-16 pb-10"
+          className="pt-16 pb-10 text-center text-9xl"
         >
           Threads of Time
         </div>
@@ -80,16 +80,16 @@ export default function Home() {
           Your life is a story. See the plot unfold.
         </div>
 
-        <div className="pb-20 w-full">
-          <div className="h-28 flex justify-center items-center bg-amber-50 text-black">
+        <div className="w-full pb-20">
+          <div className="flex h-28 items-center justify-center bg-amber-50 text-black">
             Advertisement
           </div>
         </div>
       </div>
 
-      <div className="flex gap-3 justify-center pb-3">
+      <div className="flex justify-center gap-3 pb-3">
         <button
-          className="btn btn-sm btn-primary rounded-field "
+          className="btn btn-sm btn-primary rounded-field"
           title="Add event"
           style={{ anchorName: "--anchor-1" } as React.CSSProperties}
           onClick={() => {
@@ -102,7 +102,7 @@ export default function Home() {
           <Pencil size={16} />
         </button>
         <div
-          className="m-1 dropdown w-52 dropdown-left dropdown-center menu rounded-box bg-base-100 shadow-sm"
+          className="dropdown dropdown-left dropdown-center menu rounded-box bg-base-100 m-1 w-52 shadow-sm"
           popover="auto"
           ref={popOverRef}
           style={{ positionAnchor: "--anchor-1" } as React.CSSProperties}
@@ -131,7 +131,7 @@ export default function Home() {
               ref={inputRef}
               type="text"
               placeholder="Event name"
-              className="input "
+              className="input"
               value={event}
               onChange={(e) => {
                 setEvent(e.target.value);
@@ -139,7 +139,7 @@ export default function Home() {
               onMouseEnter={(e) => e.currentTarget.focus()}
               onMouseLeave={(e) => e.currentTarget.blur()}
             />
-            <div className="flex gap-1 justify-between items-center">
+            <div className="flex items-center justify-between gap-1">
               <input
                 type="number"
                 min={0}
@@ -186,9 +186,9 @@ export default function Home() {
         </button>
       </div>
 
-      <div className="px-4 w-full overflow-auto">
+      <div className="w-full overflow-auto px-4">
         <div
-          className="grid auto-rows-min gap-2 px-4 pt-2 pb-4 rounded-box shadow-sm bg-base-100 min-w-max"
+          className="rounded-box bg-base-100 grid min-w-max auto-rows-min gap-2 px-4 pt-2 pb-4 shadow-sm"
           style={{ gridTemplateColumns: `repeat(${totalColumns},45px)` }}
         >
           {headRow.map((year) => (
@@ -202,7 +202,7 @@ export default function Home() {
             return (
               <div
                 key={event.event}
-                className="bg-primary py-1 px-2 rounded-field text-primary-content cursor-pointer flex justify-between"
+                className="bg-primary rounded-field text-primary-content flex cursor-pointer justify-between px-2 py-1"
                 title={event.event}
                 style={{ gridColumnStart: colStart, gridColumnEnd: colEnd }}
               >

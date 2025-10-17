@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import "./globals.css";
+import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 
 const geist = Geist({
@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={geist.className}>
-      <body className="bg-base-300 min-h-dvh text-base-content flex flex-col justify-center">
+      <body className="bg-base-300 text-base-content flex min-h-dvh flex-col justify-center">
         {children}
       </body>
     </html>
