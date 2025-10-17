@@ -1,6 +1,6 @@
 "use client";
 
-import { Eraser, Pencil } from "lucide-react";
+import { Calendar1, Eraser, Pencil } from "lucide-react";
 import { Bungee_Inline } from "next/font/google";
 import { useRef, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
@@ -49,7 +49,7 @@ export default function Home() {
   const [deleteMode, setDeletemode] = useState(false);
   const [event, setEvent] = useState("");
   const [startYear, setStartYear] = useState("1991");
-  const [endYear, setEndYear] = useState("");
+  const [endYear, setEndYear] = useState("1991");
   const [events, setEvents] = useLocalStorage<Event[]>(
     "events",
     defaultEvents,
@@ -60,6 +60,8 @@ export default function Home() {
     lastYear: Math.max(...events.map((event) => event.endYear)),
   };
   const totalColumns = bounds.lastYear - bounds.firstYear + 1;
+  console.log(bounds);
+  console.log(totalColumns);
   const headRow = Array.from(
     { length: totalColumns },
     (_, index) => bounds.firstYear + index,
@@ -87,7 +89,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex justify-center gap-3 pb-3">
+      <div className="flex justify-center gap-3">
         <button
           className="btn btn-sm btn-primary rounded-field"
           title="Add event"
@@ -186,40 +188,49 @@ export default function Home() {
         </button>
       </div>
 
-      <div className="w-full overflow-auto px-4">
-        <div
-          className="rounded-box bg-base-100 grid min-w-max auto-rows-min gap-2 px-4 pt-2 pb-4 shadow-sm"
-          style={{ gridTemplateColumns: `repeat(${totalColumns},45px)` }}
-        >
-          {headRow.map((year) => (
-            <div className="text-center" key={year}>
-              {year}
+      <div className="w-full overflow-auto px-4 py-3">
+        <div className="rounded-box bg-base-100 flex min-h-40 w-fit min-w-full shadow-sm">
+          {events.length ? (
+            <div
+              className="grid min-w-max auto-rows-min gap-2 px-4 pt-2 pb-4"
+              style={{ gridTemplateColumns: `repeat(${totalColumns},45px)` }}
+            >
+              {headRow.map((year) => (
+                <div className="text-center" key={year}>
+                  {year}
+                </div>
+              ))}
+              {events.map((event, eventIndex) => {
+                const colStart = event.startYear - bounds.firstYear + 1;
+                const colEnd = event.endYear - bounds.firstYear + 2;
+                return (
+                  <div
+                    key={event.event}
+                    className="bg-primary rounded-field text-primary-content flex cursor-pointer justify-between px-2 py-1"
+                    title={event.event}
+                    style={{ gridColumnStart: colStart, gridColumnEnd: colEnd }}
+                  >
+                    <div className="truncate"> {event.event}</div>
+                    <button
+                      hidden={!deleteMode}
+                      title={`Erase "${event.event}"`}
+                      className="btn btn-xs btn-error rounded-field"
+                      onClick={() => {
+                        setEvents(sortEvents(events.toSpliced(eventIndex, 1)));
+                      }}
+                    >
+                      <Eraser size={12} />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-          {events.map((event, eventIndex) => {
-            const colStart = event.startYear - bounds.firstYear + 1;
-            const colEnd = event.endYear - bounds.firstYear + 2;
-            return (
-              <div
-                key={event.event}
-                className="bg-primary rounded-field text-primary-content flex cursor-pointer justify-between px-2 py-1"
-                title={event.event}
-                style={{ gridColumnStart: colStart, gridColumnEnd: colEnd }}
-              >
-                <div className="truncate"> {event.event}</div>
-                <button
-                  hidden={!deleteMode}
-                  title={`Erase "${event.event}"`}
-                  className="btn btn-xs btn-error rounded-field"
-                  onClick={() => {
-                    setEvents(sortEvents(events.toSpliced(eventIndex, 1)));
-                  }}
-                >
-                  <Eraser size={12} />
-                </button>
-              </div>
-            );
-          })}
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center">
+              <Calendar1 />
+              Add some events.
+            </div>
+          )}
         </div>
       </div>
     </div>
