@@ -10,18 +10,40 @@ const bungeeInline = Bungee_Inline({
   subsets: ["latin"],
 });
 
-type Event = { event: string; startYear: number; endYear: number };
+type Event = { id: string; event: string; startYear: number; endYear: number };
 const defaultEvents: Event[] = sortEvents([
-  { event: "Arcades, VHS, and Mall Culture", startYear: 1991, endYear: 1999 },
-  { event: "Smartphone Revolution", startYear: 2007, endYear: 2015 },
-  { event: "COVID-19 Pandemic", startYear: 2019, endYear: 2023 },
   {
+    id: crypto.randomUUID(),
+    event: "Arcades, VHS, and Mall Culture",
+    startYear: 1991,
+    endYear: 1999,
+  },
+  {
+    id: crypto.randomUUID(),
+    event: "Smartphone Revolution",
+    startYear: 2007,
+    endYear: 2015,
+  },
+  {
+    id: crypto.randomUUID(),
+    event: "COVID-19 Pandemic",
+    startYear: 2019,
+    endYear: 2023,
+  },
+  {
+    id: crypto.randomUUID(),
     event: "AOL, Chatrooms, and Instant Messaging",
     startYear: 1996,
     endYear: 2004,
   },
-  { event: "Facebook Becomes the Internet", startYear: 2008, endYear: 2016 },
   {
+    id: crypto.randomUUID(),
+    event: "Facebook Becomes the Internet",
+    startYear: 2008,
+    endYear: 2016,
+  },
+  {
+    id: crypto.randomUUID(),
     event: "ChatGPT",
     startYear: 2022,
     endYear: new Date().getFullYear(),
@@ -120,6 +142,7 @@ export default function Home() {
                 sortEvents([
                   ...events,
                   {
+                    id: crypto.randomUUID(),
                     event: event,
                     startYear: Number(startYear),
                     endYear: Number(endYear),
@@ -210,12 +233,12 @@ export default function Home() {
                   {year}
                 </div>
               ))}
-              {events.map((event, eventIndex) => {
+              {events.map((event) => {
                 const colStart = event.startYear - bounds.firstYear + 1;
                 const colEnd = event.endYear - bounds.firstYear + 2;
                 return (
                   <div
-                    key={event.event}
+                    key={event.id}
                     className="bg-primary rounded-field text-primary-content flex cursor-pointer justify-between px-2 py-1"
                     title={event.event}
                     style={{ gridColumnStart: colStart, gridColumnEnd: colEnd }}
@@ -226,7 +249,9 @@ export default function Home() {
                       title={`Erase "${event.event}"`}
                       className="btn btn-xs btn-error rounded-field"
                       onClick={() => {
-                        setEvents(sortEvents(events.toSpliced(eventIndex, 1)));
+                        setEvents(
+                          sortEvents(events.filter((e) => e.id !== event.id)),
+                        );
                       }}
                     >
                       <Eraser size={12} />
