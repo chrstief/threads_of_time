@@ -152,6 +152,9 @@ export default function Home() {
                 value={startYear}
                 onChange={(e) => {
                   setStartYear(e.target.value);
+                  setEndYear(
+                    String(Math.max(Number(e.target.value), Number(endYear))),
+                  );
                 }}
                 onMouseEnter={(e) => e.currentTarget.focus()}
                 onMouseLeave={(e) => e.currentTarget.blur()}
@@ -161,9 +164,14 @@ export default function Home() {
                 type="number"
                 placeholder="End year"
                 className="input text-center"
-                value={Math.max(Number(endYear), Number(startYear))}
+                value={endYear}
                 onChange={(e) => {
                   setEndYear(e.target.value);
+                }}
+                onBlur={() => {
+                  setEndYear(
+                    String(Math.max(Number(startYear), Number(endYear))),
+                  );
                 }}
                 onMouseEnter={(e) => e.currentTarget.focus()}
                 onMouseLeave={(e) => e.currentTarget.blur()}
