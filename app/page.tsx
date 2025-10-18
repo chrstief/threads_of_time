@@ -12,16 +12,20 @@ const bungeeInline = Bungee_Inline({
 
 type Event = { event: string; startYear: number; endYear: number };
 const defaultEvents: Event[] = sortEvents([
-  { event: "World War I", startYear: 1914, endYear: 1918 },
-  { event: "Spanish Flu Pandemic", startYear: 1918, endYear: 1920 },
-  { event: "Great Depression", startYear: 1929, endYear: 1939 },
-  { event: "World War II", startYear: 1939, endYear: 1945 },
-  { event: "Cold War", startYear: 1947, endYear: 1991 },
-  { event: "Korean War", startYear: 1950, endYear: 1953 },
-  { event: "Vietnam War", startYear: 1955, endYear: 1975 },
-  { event: "Space Race", startYear: 1957, endYear: 1975 },
-  { event: "Civil Rights Movement", startYear: 1954, endYear: 1968 },
-  { event: "Internet Development", startYear: 1969, endYear: 1990 },
+  { event: "Arcades, VHS, and Mall Culture", startYear: 1991, endYear: 1999 },
+  { event: "Smartphone Revolution", startYear: 2007, endYear: 2015 },
+  { event: "COVID-19 Pandemic", startYear: 2019, endYear: 2023 },
+  {
+    event: "AOL, Chatrooms, and Instant Messaging",
+    startYear: 1996,
+    endYear: 2004,
+  },
+  { event: "Facebook Becomes the Internet", startYear: 2008, endYear: 2016 },
+  {
+    event: "ChatGPT",
+    startYear: 2022,
+    endYear: new Date().getFullYear(),
+  },
 ]);
 
 function sortEvents(events: Event[]): Event[] {
@@ -60,8 +64,6 @@ export default function Home() {
     lastYear: Math.max(...events.map((event) => event.endYear)),
   };
   const totalColumns = bounds.lastYear - bounds.firstYear + 1;
-  console.log(bounds);
-  console.log(totalColumns);
   const headRow = Array.from(
     { length: totalColumns },
     (_, index) => bounds.firstYear + index,
