@@ -248,9 +248,13 @@ export default function Home() {
                 </div>
               ))}
               {events.map((event) => (
-                <div
+                <button
                   key={event.id}
-                  className="bg-primary rounded-field text-primary-content m-0.5 flex cursor-pointer justify-between px-2 py-1"
+                  className={
+                    deleteMode
+                      ? "hover:btn-error btn btn-primary btn-sm rounded-field m-0.5 truncate"
+                      : "btn btn-primary btn-sm rounded-field m-0.5 truncate"
+                  }
                   title={event.event}
                   style={{
                     gridColumnStart: `y${event.start.replace("-", "m")}`,
@@ -258,21 +262,15 @@ export default function Home() {
                       `y${event.end.replace("-", "m")}`,
                     ),
                   }}
+                  onClick={() => {
+                    if (!deleteMode) return;
+                    setEvents(
+                      sortEvents(events.filter((e) => e.id !== event.id)),
+                    );
+                  }}
                 >
-                  <div className="truncate"> {event.event}</div>
-                  <button
-                    hidden={!deleteMode}
-                    title={`Erase "${event.event}"`}
-                    className="btn btn-xs btn-error rounded-field"
-                    onClick={() => {
-                      setEvents(
-                        sortEvents(events.filter((e) => e.id !== event.id)),
-                      );
-                    }}
-                  >
-                    <Eraser size={12} />
-                  </button>
-                </div>
+                  {event.event}
+                </button>
               ))}
             </div>
           ) : (
