@@ -10,56 +10,56 @@ const bungeeInline = Bungee_Inline({
   subsets: ["latin"],
 });
 
-type Event = { id: string; event: string; startYear: number; endYear: number };
+type Event = { id: string; event: string; start: string; end: string };
 const defaultEvents: Event[] = sortEvents([
   {
     id: crypto.randomUUID(),
     event: "Arcades, VHS, and Mall Culture",
-    startYear: 1991,
-    endYear: 1999,
-  },
-  {
-    id: crypto.randomUUID(),
-    event: "Smartphone Revolution",
-    startYear: 2007,
-    endYear: 2015,
-  },
-  {
-    id: crypto.randomUUID(),
-    event: "COVID-19 Pandemic",
-    startYear: 2019,
-    endYear: 2023,
+    start: "1991-01",
+    end: "1999-12",
   },
   {
     id: crypto.randomUUID(),
     event: "AOL, Chatrooms, and Instant Messaging",
-    startYear: 1996,
-    endYear: 2004,
+    start: "1996-03",
+    end: "2004-06",
   },
   {
     id: crypto.randomUUID(),
-    event: "Facebook Becomes the Internet",
-    startYear: 2008,
-    endYear: 2016,
+    event: "Smartphone Revolution",
+    start: "2007-01",
+    end: "2015-09",
+  },
+  {
+    id: crypto.randomUUID(),
+    event: "Facebook becomes the Internet",
+    start: "2008-01",
+    end: "2016-12",
+  },
+  {
+    id: crypto.randomUUID(),
+    event: "COVID-19 Pandemic",
+    start: "2019-12",
+    end: "2023-05",
   },
   {
     id: crypto.randomUUID(),
     event: "ChatGPT",
-    startYear: 2022,
-    endYear: new Date().getFullYear(),
+    start: "2022-11",
+    end: `${new Date().getFullYear()}-12`,
   },
 ]);
 
 function sortEvents(events: Event[]): Event[] {
   // Sort by start year first
-  const sorted = events.toSorted((a, b) => a.startYear - b.startYear);
+  const sorted = events.toSorted((a, b) => a.start.localeCompare(b.start));
 
   // Each row is an array of events
   const rows: Event[][] = [];
 
   for (const event of sorted) {
     // Try to find a row where it fits
-    const targetRow = rows.find((row) => row.at(-1)!.endYear < event.startYear);
+    const targetRow = rows.find((row) => row.at(-1)!.end < event.start);
     if (targetRow) {
       targetRow.push(event);
     } else {
@@ -74,22 +74,35 @@ export default function Home() {
   const popOverRef = useRef<HTMLDivElement>(null);
   const [deleteMode, setDeletemode] = useState(false);
   const [event, setEvent] = useState("");
-  const [startYear, setStartYear] = useState("1991");
-  const [endYear, setEndYear] = useState("1991");
+  const [start, setStart] = useState("1991-01");
+  const [end, setEnd] = useState("1991-01");
   const [events, setEvents] = useLocalStorage<Event[]>(
     "events",
     defaultEvents,
     { initializeWithValue: false },
   );
   const bounds = {
-    firstYear: Math.min(...events.map((event) => event.startYear)),
-    lastYear: Math.max(...events.map((event) => event.endYear)),
+    firstYear: Number(events[0].start.split("-")[0]) - 1,
+    lastYear:
+      Math.max(...events.map((event) => Number(event.end.split("-")[0]))) + 1,
   };
-  const totalColumns = bounds.lastYear - bounds.firstYear + 1;
+  const numberOfYears = bounds.lastYear - bounds.firstYear + 1;
   const headRow = Array.from(
-    { length: totalColumns },
+    { length: numberOfYears },
     (_, index) => bounds.firstYear + index,
   );
+  const gridLineNames = headRow.flatMap((year) =>
+    Array.from(
+      { length: 12 },
+      (_, index) => `y${year}m${String(index + 1).padStart(2, "0")}`,
+    ),
+  );
+  function getNextMonth(gridLineName: string) {
+    const startIndex = gridLineNames.indexOf(gridLineName);
+    const nextGridLineName = gridLineNames[startIndex + 1];
+    return nextGridLineName;
+  }
+
   return (
     <div>
       {/* <ThemeController /> */}
@@ -137,21 +150,21 @@ export default function Home() {
             className="flex flex-col gap-2"
             onSubmit={(e) => {
               e.preventDefault();
-              if (!event || !startYear || !endYear) return;
+              if (!event || !start || !end) return;
               setEvents(
                 sortEvents([
                   ...events,
                   {
                     id: crypto.randomUUID(),
                     event: event,
-                    startYear: Number(startYear),
-                    endYear: Number(endYear),
+                    start: start,
+                    end: end,
                   },
                 ]),
               );
               popOverRef.current?.hidePopover();
               setEvent("");
-              setStartYear(endYear);
+              setStart(end);
             }}
           >
             <input
@@ -166,40 +179,30 @@ export default function Home() {
               onMouseEnter={(e) => e.currentTarget.focus()}
               onMouseLeave={(e) => e.currentTarget.blur()}
             />
-            <div className="flex items-center justify-between gap-1">
-              <input
-                type="number"
-                min={0}
-                placeholder="Start year"
-                className="input text-center"
-                value={startYear}
-                onChange={(e) => {
-                  setStartYear(e.target.value);
-                  setEndYear(
-                    String(Math.max(Number(e.target.value), Number(endYear))),
-                  );
-                }}
-                onMouseEnter={(e) => e.currentTarget.focus()}
-                onMouseLeave={(e) => e.currentTarget.blur()}
-              />
-              <div className="px-1">-</div>
-              <input
-                type="number"
-                placeholder="End year"
-                className="input text-center"
-                value={endYear}
-                onChange={(e) => {
-                  setEndYear(e.target.value);
-                }}
-                onBlur={() => {
-                  setEndYear(
-                    String(Math.max(Number(startYear), Number(endYear))),
-                  );
-                }}
-                onMouseEnter={(e) => e.currentTarget.focus()}
-                onMouseLeave={(e) => e.currentTarget.blur()}
-              />
-            </div>
+            <input
+              type="month"
+              className="input text-center"
+              value={start}
+              onChange={(e) => {
+                setStart(e.target.value);
+                if (e.target.value > end) setEnd(e.target.value);
+              }}
+              onMouseEnter={(e) => e.currentTarget.focus()}
+              onMouseLeave={(e) => e.currentTarget.blur()}
+            />
+            <input
+              type="month"
+              className="input text-center"
+              value={end}
+              onChange={(e) => {
+                setEnd(e.target.value);
+              }}
+              onBlur={() => {
+                if (start > end) setEnd(start);
+              }}
+              onMouseEnter={(e) => e.currentTarget.focus()}
+              onMouseLeave={(e) => e.currentTarget.blur()}
+            />
             <button type="submit" className="btn btn-primary rounded-field">
               Add
             </button>
@@ -225,40 +228,52 @@ export default function Home() {
         <div className="rounded-box bg-base-100 flex min-h-40 w-fit min-w-full shadow-sm">
           {events.length ? (
             <div
-              className="grid min-w-max auto-rows-min gap-2 px-4 pt-2 pb-4"
-              style={{ gridTemplateColumns: `repeat(${totalColumns},45px)` }}
+              className="grid min-w-max auto-rows-min px-4 pt-2 pb-4"
+              style={{
+                gridTemplateColumns: gridLineNames
+                  .map((gridLineName) => `[${gridLineName}]`)
+                  .join(" 4px "),
+              }}
             >
               {headRow.map((year) => (
-                <div className="text-center" key={year}>
+                <div
+                  className="text-center"
+                  key={year}
+                  style={{
+                    gridColumnStart: `y${year}m01`,
+                    gridColumnEnd: getNextMonth(`y${year}m12`),
+                  }}
+                >
                   {year}
                 </div>
               ))}
-              {events.map((event) => {
-                const colStart = event.startYear - bounds.firstYear + 1;
-                const colEnd = event.endYear - bounds.firstYear + 2;
-                return (
-                  <div
-                    key={event.id}
-                    className="bg-primary rounded-field text-primary-content flex cursor-pointer justify-between px-2 py-1"
-                    title={event.event}
-                    style={{ gridColumnStart: colStart, gridColumnEnd: colEnd }}
+              {events.map((event) => (
+                <div
+                  key={event.id}
+                  className="bg-primary rounded-field text-primary-content m-0.5 flex cursor-pointer justify-between px-2 py-1"
+                  title={event.event}
+                  style={{
+                    gridColumnStart: `y${event.start.replace("-", "m")}`,
+                    gridColumnEnd: getNextMonth(
+                      `y${event.end.replace("-", "m")}`,
+                    ),
+                  }}
+                >
+                  <div className="truncate"> {event.event}</div>
+                  <button
+                    hidden={!deleteMode}
+                    title={`Erase "${event.event}"`}
+                    className="btn btn-xs btn-error rounded-field"
+                    onClick={() => {
+                      setEvents(
+                        sortEvents(events.filter((e) => e.id !== event.id)),
+                      );
+                    }}
                   >
-                    <div className="truncate"> {event.event}</div>
-                    <button
-                      hidden={!deleteMode}
-                      title={`Erase "${event.event}"`}
-                      className="btn btn-xs btn-error rounded-field"
-                      onClick={() => {
-                        setEvents(
-                          sortEvents(events.filter((e) => e.id !== event.id)),
-                        );
-                      }}
-                    >
-                      <Eraser size={12} />
-                    </button>
-                  </div>
-                );
-              })}
+                    <Eraser size={12} />
+                  </button>
+                </div>
+              ))}
             </div>
           ) : (
             <div className="flex flex-1 flex-col items-center justify-center">
